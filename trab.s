@@ -24,11 +24,12 @@ n:							.int	0
 p:							.int 	0
 tamanhoMatrizA:	.int 	0
 tamanhoMatrizB:	.int 	0
-puloB:					.int 	0
+jumpB:					.int 	0
 var:						.int 	0
 
 vetor1:	.space 900
 vetor2:	.space 900
+vetorR:	.space 900
 
 .section .text
 
@@ -206,101 +207,130 @@ alteraLinhaB:
 	cmp  n,%ebx
 	jle  preencheColunaB
 
-printaMatrizA:
-	
-	pushl $mensagemMatrizA
-	call  printf
-	popl 	%ebx
+# Pular de uma coluna pra outra na Matriz B
+calculaJumpB:
+	movl	p,	%eax
+	movl	$4, %ecx
+	mull  %ecx
 
-	movl	$vetor1,	%edi
-	movl	tamanhoMatrizA,	%ecx
+	movl	$jumpB, %ebx
+	movl	%eax,	(%ebx)
 
-	movl	$0, %ebx
-	movl	$0,	%edx
-	jmp 	printNumerosMatrizA
+calculaJumpA:
+	movl	n, %eax
+	movl	$4,	%ecx
+	mull  %ecx
 
-quebraA:
+	movl	$jumpA, %ebx
+	movl	%eax,	(%ebx)
 
-	pushl	%ecx
-	pushl $barraN
-	call 	printf
+inicializaMultiplicacao:
 
-	popl	%ebx
-	popl	%ecx
-
-	movl	$0, %edx
-
-printNumerosMatrizA:
-	cmp		n, %edx
-	je 		quebraA
-
-	movl 	(%edi), %eax
-	addl 	$4, %edi
-	
-	pushl %ecx
-	pushl %edx
-	pushl	%eax
-	pushl $elemento
-
-	call  printf
-
-	popl 	%ebx
-	popl 	%eax
-	popl 	%edx
-	popl 	%ecx
-
-	incl	%edx
-	loop	printNumerosMatrizA
-
-printMatrizB:
-
-	pushl $mensagemMatrizB
-	call 	printf
-	popl	%ebx
-
+	movl	$vetor1,	%ebp
 	movl	$vetor2,	%edi
-	movl	tamanhoMatrizB,	%ecx
-
-	movl	$0, %ebx
+	movl	$vetorR,	%esi
+	movl	$0,	%eax
+	movl	$0,	%ebx
+	movl	$0,	%ecx
 	movl	$0,	%edx
-	jmp 	printNumerosMatrizB
 
-quebraB:
 
-	pushl	%ecx
-	pushl $barraN
-	call 	printf
 
-	popl	%ebx
-	popl	%ecx
-
-	movl	$0, %edx
-
-printNumerosMatrizB:
-	cmp		n, %edx
-	je 		quebraB
-
-	movl 	(%edi), %eax
-	addl 	$4, %edi
+# printaMatrizA:
 	
-	pushl %ecx
-	pushl %edx
-	pushl	%eax
-	pushl $elemento
+# 	pushl $mensagemMatrizA
+# 	call  printf
+# 	popl 	%ebx
 
-	call  printf
+# 	movl	$vetor1,	%edi
+# 	movl	tamanhoMatrizA,	%ecx
 
-	popl 	%ebx
-	popl 	%eax
-	popl 	%edx
-	popl 	%ecx
+# 	movl	$0, %ebx
+# 	movl	$0,	%edx
+# 	jmp 	printNumerosMatrizA
 
-	incl	%edx
-	loop	printNumerosMatrizB
+# quebraA:
 
-finaliza:
-	pushl $barraN
-	call 	printf
-	popl	%ebx
+# 	pushl	%ecx
+# 	pushl $barraN
+# 	call 	printf
 
-	call exit
+# 	popl	%ebx
+# 	popl	%ecx
+
+# 	movl	$0, %edx
+
+# printNumerosMatrizA:
+# 	cmp		n, %edx
+# 	je 		quebraA
+
+# 	movl 	(%edi), %eax
+# 	addl 	$4, %edi
+	
+# 	pushl %ecx
+# 	pushl %edx
+# 	pushl	%eax
+# 	pushl $elemento
+
+# 	call  printf
+
+# 	popl 	%ebx
+# 	popl 	%eax
+# 	popl 	%edx
+# 	popl 	%ecx
+
+# 	incl	%edx
+# 	loop	printNumerosMatrizA
+
+# printMatrizB:
+
+# 	pushl $mensagemMatrizB
+# 	call 	printf
+# 	popl	%ebx
+
+# 	movl	$vetor2,	%edi
+# 	movl	tamanhoMatrizB,	%ecx
+
+# 	movl	$0, %ebx
+# 	movl	$0,	%edx
+# 	jmp 	printNumerosMatrizB
+
+# quebraB:
+
+# 	pushl	%ecx
+# 	pushl $barraN
+# 	call 	printf
+
+# 	popl	%ebx
+# 	popl	%ecx
+
+# 	movl	$0, %edx
+
+# printNumerosMatrizB:
+# 	cmp		n, %edx
+# 	je 		quebraB
+
+# 	movl 	(%edi), %eax
+# 	addl 	$4, %edi
+	
+# 	pushl %ecx
+# 	pushl %edx
+# 	pushl	%eax
+# 	pushl $elemento
+
+# 	call  printf
+
+# 	popl 	%ebx
+# 	popl 	%eax
+# 	popl 	%edx
+# 	popl 	%ecx
+
+# 	incl	%edx
+# 	loop	printNumerosMatrizB
+
+# finaliza:
+# 	pushl $barraN
+# 	call 	printf
+# 	popl	%ebx
+
+# 	call exit
