@@ -234,6 +234,26 @@ inicializaMultiplicacao:
 	movl	$0,	%ecx
 	movl	$0,	%edx
 
+	movl m,	%ecx
+
+multiLinhasA:
+	pushl %ecx
+
+	movl 	p,	%ecx
+
+	multiColunaB:
+		pushl	%ecx
+
+		movl	n,	%ecx
+
+
+
+
+	loop multiColunaB
+
+
+
+loop multiLinhasA	
 
 
 # printaMatrizA:
