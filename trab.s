@@ -32,9 +32,9 @@ var:								.int 	0
 jumpA:							.int 	0
 jumpB:							.int 	0
 
-vetor1:	.space 900
-vetor2:	.space 900
-vetorR:	.space 900
+vetor1:							.space 900
+vetor2:							.space 900
+vetorR:							.space 900
 
 .section .text
 
@@ -45,7 +45,11 @@ _start:
 	pushl $abertura
 	call	printf
 
-	addl $4, %esp #Limpar a pilha
+	addl $4, %esp
+
+# Começa pedindo os valores de m, n e p.
+# Matriz A: A[m][n] 
+# Matriz B: B[n][p]
 
 linhaA:
 
@@ -55,7 +59,7 @@ linhaA:
 	pushl	$formatoNumero
 	call 	scanf
 
-	addl $12, %esp #Limpar a pilha
+	addl $12, %esp
 
 	movl m, %eax
 	cmpl $0, %eax
@@ -69,7 +73,7 @@ colunaALinhaB:
 	pushl	$formatoNumero
 	call 	scanf
 
-	addl $12, %esp #Limpar a pilha
+	addl $12, %esp 
 
 	movl n, %eax
 	cmpl $0, %eax
@@ -83,11 +87,15 @@ colunaB:
 	pushl	$formatoNumero
 	call 	scanf
 
-	addl $12, %esp #Limpar a pilha
+	addl $12, %esp 
 
 	movl	p, %eax
 	cmpl	$0, %eax
 	jle   colunaB
+
+# Faz o cálculo do tamanho da Matriz A e da Matriz B.
+# O tamanho das matrizes será utilizado para controlar os loops.
+# Para o cálculo do tamanho da matriz, foi feita a multiplicação i*j, onde A[i][j].
 
 tamanhoMatrizes:
 
@@ -104,6 +112,13 @@ tamanhoMatrizes:
 
 	movl 	$tamanhoMatrizB, %ebx
 	movl 	%eax, (%ebx)
+
+
+# Começa o preenchimento da Matriz A e B
+# Ele adiciona o endereço de memória no registrador %edi 
+#	O registrador %ebx fica responsável pelo loop das linhas
+# e o registrador %eax fica responsável pelo loop das colunas.
+# A operação "pop %ecx" foi utilizada para remover os valores da pilha.
 
 comecaPreencherMatrizA:
 	movl $vetor1, %edi
@@ -122,21 +137,21 @@ preencheColunaA:
 
 	call 	printf
 
-	pop %ecx
+	pop 	%ecx
 
 	popl 	%ebx
 	popl 	%eax
 
-  push %eax
-  push %ebx
+  push 	%eax
+  push 	%ebx
 	pushl $var
 	pushl $formatoNumero
 	call 	scanf
 
-	pop %ecx
-	pop %ecx
-	pop %ebx
-	pop %eax
+	pop 	%ecx
+	pop 	%ecx
+	pop 	%ebx
+	pop 	%eax
 
 	movl 	var, %edx
 	movl 	%edx, (%edi)
@@ -163,10 +178,10 @@ printaBarraN:
 
 comecaPreencherMatrizB:
 
-	movl $vetor2, %edi
+	movl 	$vetor2, %edi
 
-	movl $1, %ebx   #linha
-	movl $0, %eax   #coluna
+	movl 	$1, %ebx   #linha
+	movl 	$0, %eax   #coluna
 
 preencheColunaB:
 	
@@ -212,7 +227,9 @@ alteraLinhaB:
 	cmp  n,%ebx
 	jle  preencheColunaB
 
-# Pular de uma coluna pra outra na Matriz B
+# Os jumps são calculados multiplicando 4*no de colunas. 
+# Eles são utilizados para pular de uma linha para a outra
+
 calculaJumpB:
 	movl	p,	%eax
 	movl	$4, %ecx
@@ -228,6 +245,10 @@ calculaJumpA:
 
 	movl	$jumpA, %ebx
 	movl	%eax,	(%ebx)
+
+# Neste trecho, são movidos os vetores para os registradores que serão utilizados na multiplicação
+# Os registradores que serão utilizados serão zerados e a variável que será utilizada como contadora
+# também foi zerada.
 
 inicializaMultiplicacao:
 
@@ -245,6 +266,9 @@ inicializaMultiplicacao:
 
 	movl m,	%ecx
 
+# Guarda o valor de %ecx para o loop e move p, que são as colunas de B para o %ecx,
+# para que o próximo loop possa rodar nelas.
+
 multiLinhasA:
 
 	pushl %ecx
@@ -253,52 +277,72 @@ multiLinhasA:
 	pushl	%ebx
 	movl 	p,	%ecx
 
+	# Guarda o valor de %ecx para o loop e move n, que são as colunas de A para que
+	# o próximo loop possa rodar nelas
 	multiColunaB:
 
 	pushl	%ecx
 
 	movl	n,	%ecx
-
+		# Guarda o valor de %ecx para que não seja modificado por nenhuma outra expressão
 		multiColunaA:
 
 		pushl	%ecx
 
+		# Pulado para o próximo registro da matriz A.
+
+		# Move os valores que estavam nos vetores para os registradores %eax e %ebx,
+		# para que eles possam ser multiplicados
 		movl	(%ebp),	%eax
 		movl	(%edi),	%ebx
 		mull  %ebx
 
 		addl	$4,	%ebp
+
+		# Após ir para o próximo registro do vetor, o valor de jumpB é adicionado na matriz B,
+		# para ir para a primeira coluna da próxima linha. 
 		addl	jumpB,	%edi
 
+		# Move o endereço de memória do acumulador para o registrador %ebx, para
+		# que seja adicionado o valor que foi multiplicado. 
 		movl	$var,	%ebx
 		addl	%eax,	(%ebx)
 
+		# Retorna o %ecx para que o loop possa ser feito.
 		popl	%ecx
 
 		loop	multiColunaA
 
 		adicionaC:
 
+		# Move o que foi calculado para o registro da matriz Resultado.
 		movl	var,	%ebx
 		movl	%ebx,	(%esi)
 
+		# Vai para o próximo registro da matriz Resultado.
 		addl	$4,	%esi
+
 		# Limpa o acumulador para fazer a próxima multiplicação
 		movl	$var,	%edx
 		movl	$0,	(%edx)
 
 	continuaColunaB:
 	
+	# Remove o %ecx para poder continuar este loop.
 	popl	%ecx
 
 	subl jumpA, %ebp
+
+	# Move o endereço do primeiro elemento da matriz B para o registrador
 	movl $vetor2, %edi
 
 	popl	%ebx
 
+	# Move o ponteiro da matriz B para a segunda coluna
 	addl	$4,	%ebx
 	addl	%ebx,	%edi
 
+	# Guarda novamente o ebx
 	pushl	%ebx
 
 	loop multiColunaB
@@ -310,10 +354,12 @@ movl	$vetor2,	%edi
 popl	%ebx
 popl	%ecx
 
+# Movep para a próxima linha da Matriz A.
 addl	jumpA,	%ebp
 
 loop multiLinhasA	
 
+# Utilizado para printar a matriz resultante:
 
 calculaTamanhoMatrizR:
 
@@ -323,8 +369,6 @@ calculaTamanhoMatrizR:
 
 	movl 	$tamanhoMatrizR, %ebx
 	movl 	%eax, (%ebx)
-
-
 
 printMatrizR:
 
