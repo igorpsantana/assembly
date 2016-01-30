@@ -35,7 +35,7 @@ jumpB:							.int 	0
 vetor1:							.space 900
 vetor2:							.space 900
 vetorR:							.space 900
-
+vetorR2:						.space 900
 .section .text
 
 .globl	_start
@@ -297,6 +297,7 @@ multiLinhasA:
 		movl	(%edi),	%ebx
 		mull  %ebx
 
+
 		addl	$4,	%ebp
 
 		# Após ir para o próximo registro do vetor, o valor de jumpB é adicionado na matriz B,
@@ -354,13 +355,107 @@ movl	$vetor2,	%edi
 popl	%ebx
 popl	%ecx
 
-# Movep para a próxima linha da Matriz A.
+# Move para a próxima linha da Matriz A.
 addl	jumpA,	%ebp
 
 loop multiLinhasA	
 
-# Utilizado para printar a matriz resultante:
+printMatrizA:
 
+	pushl $mensagemMatrizA
+	call 	printf
+	popl	%ebx
+
+	movl	$vetor1,	%edi
+	movl	tamanhoMatrizA,	%ecx
+
+	movl	$0, %ebx
+	movl	$0,	%edx
+	jmp 	printNumerosMatrizA
+
+quebraA:
+
+	pushl	%ecx
+	pushl $barraN
+	call 	printf
+
+	popl	%ebx
+	popl	%ecx
+
+	movl	$0, %edx
+
+printNumerosMatrizA:
+	cmp		n, %edx
+	je 		quebraA
+
+	movl 	(%edi), %eax
+	addl 	$4, %edi
+	
+	pushl %ecx
+	pushl %edx
+	pushl	%eax
+	pushl $elemento
+
+	call  printf
+
+	popl 	%ebx
+	popl 	%eax
+	popl 	%edx
+	popl 	%ecx
+
+	incl	%edx
+	loop	printNumerosMatrizA
+
+
+printMatrizB:
+
+	pushl $mensagemMatrizB
+	call 	printf
+	popl	%ebx
+
+	movl	$vetor2,	%edi
+	movl	tamanhoMatrizB,	%ecx
+
+	movl	$0, %ebx
+	movl	$0,	%edx
+	jmp 	printNumerosMatrizB
+
+quebraB:
+
+	pushl	%ecx
+	pushl $barraN
+	call 	printf
+
+	popl	%ebx
+	popl	%ecx
+
+	movl	$0, %edx
+
+printNumerosMatrizB:
+	cmp		n, %edx
+	je 		quebraB
+
+	movl 	(%edi), %eax
+	addl 	$4, %edi
+	
+	pushl %ecx
+	pushl %edx
+	pushl	%eax
+	pushl $elemento
+
+	call  printf
+
+	popl 	%ebx
+	popl 	%eax
+	popl 	%edx
+	popl 	%ecx
+
+	incl	%edx
+	loop	printNumerosMatrizB
+
+
+
+# Utilizado para printar a matriz resultante:
 calculaTamanhoMatrizR:
 
 	movl	m, %eax
@@ -395,11 +490,11 @@ quebraR:
 	movl	$0, %edx
 
 printNumerosMatrizR:
-	cmp		n, %edx
+	cmp		p, %edx
 	je 		quebraR
 
 	movl 	(%edi), %eax
-	addl 	$4, %edi
+	addl 	$4, 		%edi
 	
 	pushl %ecx
 	pushl %edx
@@ -422,64 +517,3 @@ finaliza:
 	popl	%ebx
 
 	call exit
-
-
-
-
-
-
-
-
-
-# printMatrizB:
-
-# 	pushl $mensagemMatrizB
-# 	call 	printf
-# 	popl	%ebx
-
-# 	movl	$vetor2,	%edi
-# 	movl	tamanhoMatrizB,	%ecx
-
-# 	movl	$0, %ebx
-# 	movl	$0,	%edx
-# 	jmp 	printNumerosMatrizB
-
-# quebraB:
-
-# 	pushl	%ecx
-# 	pushl $barraN
-# 	call 	printf
-
-# 	popl	%ebx
-# 	popl	%ecx
-
-# 	movl	$0, %edx
-
-# printNumerosMatrizB:
-# 	cmp		n, %edx
-# 	je 		quebraB
-
-# 	movl 	(%edi), %eax
-# 	addl 	$4, %edi
-	
-# 	pushl %ecx
-# 	pushl %edx
-# 	pushl	%eax
-# 	pushl $elemento
-
-# 	call  printf
-
-# 	popl 	%ebx
-# 	popl 	%eax
-# 	popl 	%edx
-# 	popl 	%ecx
-
-# 	incl	%edx
-# 	loop	printNumerosMatrizB
-
-# finaliza:
-# 	pushl $barraN
-# 	call 	printf
-# 	popl	%ebx
-
-# 	call exit
