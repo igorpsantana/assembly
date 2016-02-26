@@ -5,7 +5,7 @@ pedeLinhaA: 				.asciz	"Digite o número de linhas da matriz A\n"
 pedeColunaAeLinhaB: .asciz	"Digite o número de colunas da matriz A e o número de linhas da matriz B\n"
 pedeColunaB:				.asciz	"Digite o número de colunas da matriz B\n"
 formatoNumero:			.asciz	"%d"
-# formatoLongFloat:		.asciz	"%lf"
+
 # tamanhoAPrint:			.asciz	"Tamanho A: %d \n"
 # tamanhoBPrint:			.asciz	"Tamanho B: %d \n"
 barraN:							.asciz	"\n"
@@ -28,7 +28,7 @@ tamanhoMatrizA:			.int 	0
 tamanhoMatrizB:			.int 	0
 tamanhoMatrizR:			.int 	0
 
-varx:								.double 0
+varx:								.double 1.5
 
 var:								.int  0
 lixoDaFpu:					.double 0.0
@@ -42,7 +42,7 @@ vetorR2:						.space 900
 
 SYS_EXIT:						.int 1
 SYS_FORK:						.int 2
-SYS_READ:                       .int 3
+SYS_READ:           .int 3
 SYS_WRITE:					.int 4
 SYS_OPEN:						.int 5
 SYS_CLOSE:					.int 6
@@ -71,7 +71,7 @@ S_IXOTH:						.int 0x0001
 S_NADA:							.int 0x0000
 
 nomearqleitura:			.asciz	"arq.txt"
-contLinha:					.space 80
+contLinha:					.space 20
 valorAsc:           .space 10
 tamarqin:						.int 80
 mostrastr:					.asciz " %s"
@@ -85,6 +85,12 @@ nomearqescrita:     .asciz "arq2.txt"
 
 _start:
 
+pushl $abertura
+
+call	printf
+addl $4, %esp
+
+
 linhaA:
 
 	pushl	$pedeLinhaA
@@ -93,7 +99,7 @@ linhaA:
 	pushl	$formatoNumero
 	call 	scanf
 
-	addl $12, %esp #Limpar a pilha
+	addl $12, %esp
 
 	movl m, %eax
 	cmpl $0, %eax
@@ -107,7 +113,7 @@ colunaALinhaB:
 	pushl	$formatoNumero
 	call 	scanf
 
-	addl $12, %esp #Limpar a pilha
+	addl $12, %esp 
 
 	movl n, %eax
 	cmpl $0, %eax
@@ -121,7 +127,7 @@ colunaB:
 	pushl	$formatoNumero
 	call 	scanf
 
-	addl $12, %esp #Limpar a pilha
+	addl $12, %esp 
 
 	movl	p, %eax
 	cmpl	$0, %eax
@@ -129,19 +135,19 @@ colunaB:
 
 tamanhoMatrizes:
 
-	movl	m, %eax
-	movl	n, %ebx
-	mull	%ebx
+movl	m, %eax
+movl	n, %ebx
+mull	%ebx
 
-	movl 	$tamanhoMatrizA, %ebx
-	movl 	%eax, (%ebx)
+movl 	$tamanhoMatrizA, %ebx
+movl 	%eax, (%ebx)
 
-	movl	n, %eax
-	movl	p, %ebx
-	mull	%ebx
+movl	n, %eax
+movl	p, %ebx
+mull	%ebx
 
-	movl 	$tamanhoMatrizB, %ebx
-	movl 	%eax, (%ebx)
+movl 	$tamanhoMatrizB, %ebx
+movl 	%eax, (%ebx)
 
 learquivo:
 
@@ -150,15 +156,15 @@ learquivo:
 	movl O_RDONLY, %ecx
 	int  $0x80
 
-  movl tamanhoMatrizA, %ecx
-  movl $vetor1, %edi
+  movl tamanhoMatrizA,%ecx
+ 	movl	$vetor1, %edi
 
   LeElemento:
-  push %ecx                 
+  push %ecx                 #1
   movl $valorAsc,%esi
 	LEITURA:
-  push %eax                 
-  push %esi                 
+  push %eax                 #2
+  push %esi                 #3
 	movl %eax, %ebx
 	movl $3, %eax
 	movl $contLinha, %ecx
@@ -183,43 +189,35 @@ CONTINUA:
 	movb $0x00,(%esi)
   push $valorAsc            #5
   call atof
-  addl $8,%esp
+  addl $4,%esp
 
-	
-  subl $8,%edi
   fstpl (%edi)
-  breakx:
-  addl $16, %edi
+  addl	$8, %edi
 
   pop %eax
   pop %ecx
 
   loop LeElemento
 
-BREAK_HERE:
-  # Pula valor 0 que esta entre as matrizes
-  push %eax
-  movl %eax, %ebx
-	movl $3, %eax
-	movl $contLinha, %ecx
-	movl $1, %edx
+  pushl %eax
+  movl 	%eax, %ebx
+  movl	$3, %eax
+  movl	$contLinha, %ecx
+  movl	$1, %edx
 
-	int  $0x80
+  int $0x80
 
-	pop %eax
-
-  # Comeca leitura de B ---------------------------------
+  pop %eax
 
   movl tamanhoMatrizB, %ecx
-  movl $vetor2, %edi
+  movl	$vetor2, %edi
 
   LeElementoB:
-  push %ecx                 
+  push %ecx                 #1
   movl $valorAsc,%esi
-
 	LEITURAB:
-  push %eax                 
-  push %esi                 
+  push %eax                 #2
+  push %esi                 #3
 	movl %eax, %ebx
 	movl $3, %eax
 	movl $contLinha, %ecx
@@ -246,10 +244,8 @@ CONTINUAB:
   call atof
   addl $4,%esp
 
-  subl $8,%edi
   fstpl (%edi)
-  breakxD:
-  addl $8, %edi
+  addl	$8, %edi
 
   pop %eax
   pop %ecx
@@ -258,10 +254,8 @@ CONTINUAB:
 
 FIM:
 	movl SYS_CLOSE, %eax
-	popl %ebx
+
 	int  $0x80
-
-
 
 calculaJumpB:
 movl	p,	%eax
@@ -305,7 +299,6 @@ pushl %ecx
 
 movl	$0,	%ebx
 pushl	%ebx
-
 movl 	p,	%ecx
 
 	multiColunaB:
@@ -323,11 +316,8 @@ movl 	p,	%ecx
 		fldl 	(%ebp)
 		fldl 	(%edi)
 
-		break_1:
-
 		fmul 	%st(1), %st(0)
 		fadd	%st(0), %st(2)
-
 
 		fstpl	lixoDaFpu
 		fstpl	lixoDaFpu
@@ -341,24 +331,33 @@ movl 	p,	%ecx
 		loop	multiColunaA
 
 		adicionaC:
-		
+
+		# Move o que foi calculado para o registro da matriz Resultado.
 		fstpl (%esi)
 
+		# Vai para o próximo registro da matriz Resultado.
 		addl	$8,	%esi
+
+		# Limpa o acumulador para fazer a próxima multiplicação
+
 
 		continuaColunaB:
 
+	# Remove o %ecx para poder continuar este loop.
 	popl	%ecx
 
 	subl jumpA, %ebp
 
+	# Move o endereço do primeiro elemento da matriz B para o registrador
 	movl $vetor2, %edi
 
 	popl	%ebx
 
+	# Move o ponteiro da matriz B para a segunda coluna
 	addl	$8,	%ebx
 	addl	%ebx,	%edi
 
+	# Guarda novamente o ebx
 	pushl	%ebx
 
 	loop multiColunaB
@@ -374,8 +373,6 @@ movl 	p,	%ecx
 addl	jumpA,	%ebp
 
 loop multiLinhasA
-
-break_pimba:
 
 printMatrizA:
 
@@ -405,18 +402,19 @@ printNumerosMatrizA:
 cmp		n, %edx
 je 		quebraA
 
-movl 	(%edi), %eax
-addl 	$4, %edi
+fldl	(%edi)
+addl 	$8, %edi
 
 pushl %ecx
 pushl %edx
-pushl	%eax
+subl 	$8, %esp
+fstpl	(%esp)
 pushl $elemento
 
 call  printf
 
-popl 	%ebx
-popl 	%eax
+addl	$12, %esp
+
 popl 	%edx
 popl 	%ecx
 
@@ -452,18 +450,19 @@ printNumerosMatrizB:
 cmp		n, %edx
 je 		quebraB
 
-movl 	(%edi), %eax
-addl 	$4, %edi
+fldl	(%edi)
+addl 	$8, %edi
 
 pushl %ecx
 pushl %edx
-pushl	%eax
+subl 	$8, %esp
+fstpl	(%esp)
 pushl $elemento
 
 call  printf
 
-popl 	%ebx
-popl 	%eax
+addl	$12, %esp
+
 popl 	%edx
 popl 	%ecx
 
@@ -481,6 +480,147 @@ mull	%ebx
 
 movl 	$tamanhoMatrizR, %ebx
 movl 	%eax, (%ebx)
+
+printMatrizR:
+
+pushl $mensagemMatrizR
+call 	printf
+popl	%ebx
+
+movl	$vetorR,	%edi
+movl	tamanhoMatrizR,	%ecx
+
+movl	$0, %ebx
+movl	$0,	%edx
+jmp 	printNumerosMatrizR
+
+quebraR:
+
+pushl	%ecx
+pushl $barraN
+call 	printf
+
+popl	%ebx
+popl	%ecx
+
+movl	$0, %edx
+
+printNumerosMatrizR:
+cmp		n, %edx
+je 		quebraB
+
+fldl	(%edi)
+addl 	$8, %edi
+
+pushl %ecx
+pushl %edx
+subl 	$8, %esp
+fstpl	(%esp)
+pushl $elemento
+
+call  printf
+
+addl	$12, %esp
+
+popl 	%edx
+popl 	%ecx
+
+incl	%edx
+loop	printNumerosMatrizR
+
+
+# printMatrizR:
+
+# pushl $mensagemMatrizR
+# call 	printf
+# popl	%ebx
+
+# movl	$vetorR,	%edi
+# movl	tamanhoMatrizR,	%ecx
+
+# movl	$0, %ebx
+# movl	$0,	%edx
+# jmp 	printNumerosMatrizR
+
+# quebraR:
+
+# movl SYS_OPEN, %eax
+# movl $nomearqescrita, %ebx
+# movl O_WRONLY, %ecx
+# orl  O_CREATE, %ecx
+# movl S_IRUSR, %edx
+# orl  S_IWUSR, %edx
+# int  $0x80
+
+# pushl %eax
+
+# movl %eax, %ebx
+# movl SYS_WRITE, %eax
+# movl $barraT, %ecx
+# movl $8, %edx
+# int  $0x80
+
+# movl SYS_CLOSE, %eax
+# popl %ebx
+# int $0x80
+
+# popl	%ebx
+# popl	%ecx
+
+# movl	$0, %edx
+
+# printNumerosMatrizR:
+# cmp		p, %edx
+# je 		quebraR
+
+# movl 	(%edi), %eax
+# addl 	$4, 		%edi
+
+# pushl %eax
+# pushl %ebx
+# pushl %ecx
+# pushl %edx
+
+# movl SYS_OPEN, %eax
+# movl $nomearqescrita, %ebx
+# movl O_WRONLY, %ecx
+# orl  O_CREATE, %ecx
+# movl S_IRUSR, %edx
+# orl  S_IWUSR, %edx
+# int  $0x80
+
+# pushl %eax
+
+# movl %eax, %ebx
+# movl SYS_WRITE, %eax
+# movl $elemento, %ecx
+# movl $8, %edx
+# int  $0x80
+
+# movl SYS_CLOSE, %eax
+# popl %ebx
+# int $0x80
+
+# popl %eax
+# popl %edx
+# popl %ecx
+# popl %ebx
+# popl %eax
+
+# # pushl %ecx
+# # pushl %edx
+# # pushl	%eax
+# # pushl $elemento
+
+# # call  printf
+
+# # popl 	%ebx
+# # popl 	%eax
+# # popl 	%edx
+# # popl 	%ecx
+
+# incl	%edx
+# loop	printNumerosMatrizR
 
 finaliza:
 pushl $barraN
