@@ -113,7 +113,7 @@ colunaALinhaB:
 	pushl	$formatoNumero
 	call 	scanf
 
-	addl $12, %esp 
+	addl $12, %esp
 
 	movl n, %eax
 	cmpl $0, %eax
@@ -127,7 +127,7 @@ colunaB:
 	pushl	$formatoNumero
 	call 	scanf
 
-	addl $12, %esp 
+	addl $12, %esp
 
 	movl	p, %eax
 	cmpl	$0, %eax
@@ -292,6 +292,7 @@ movl	$0,		(%edx)
 movl	$0,	%edx
 
 movl m,	%ecx
+fldz
 
 multiLinhasA:
 
@@ -311,53 +312,39 @@ movl 	p,	%ecx
 
 		pushl	%ecx
 
-		fldl 	var
-
 		fldl 	(%ebp)
 		fldl 	(%edi)
 
 		fmul 	%st(1), %st(0)
-		fadd	%st(0), %st(2)
-
 		fstpl	lixoDaFpu
+		fadd	%st(0), %st(1)
 		fstpl	lixoDaFpu
 
 		addl	$8,	%ebp
 		addl	jumpB,	%edi
 
-		# Retorna o %ecx para que o loop possa ser feito.
 		popl	%ecx
 
 		loop	multiColunaA
 
 		adicionaC:
-
-		# Move o que foi calculado para o registro da matriz Resultado.
 		fstpl (%esi)
 
-		# Vai para o próximo registro da matriz Resultado.
 		addl	$8,	%esi
 
-		# Limpa o acumulador para fazer a próxima multiplicação
-
+		fldz
 
 		continuaColunaB:
 
-	# Remove o %ecx para poder continuar este loop.
-	popl	%ecx
-
 	subl jumpA, %ebp
 
-	# Move o endereço do primeiro elemento da matriz B para o registrador
 	movl $vetor2, %edi
+	popl	%ecx
 
 	popl	%ebx
 
-	# Move o ponteiro da matriz B para a segunda coluna
 	addl	$8,	%ebx
 	addl	%ebx,	%edi
-
-	# Guarda novamente o ebx
 	pushl	%ebx
 
 	loop multiColunaB
@@ -369,7 +356,6 @@ movl 	p,	%ecx
 	popl	%ebx
 	popl	%ecx
 
-# Move para a próxima linha da Matriz A.
 addl	jumpA,	%ebp
 
 loop multiLinhasA
