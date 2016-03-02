@@ -203,7 +203,7 @@ CONTINUA:
   movl 	%eax, %ebx
   movl	$3, %eax
   movl	$contLinha, %ecx
-  movl	$1, %edx
+  movl	$2, %edx
 
   int $0x80
 
@@ -215,6 +215,7 @@ CONTINUA:
   LeElementoB:
   push %ecx                 #1
   movl $valorAsc,%esi
+
 	LEITURAB:
   push %eax                 #2
   push %esi                 #3
@@ -312,10 +313,11 @@ movl 	p,	%ecx
 
 		pushl	%ecx
 
-		fldl 	(%ebp)
 		fldl 	(%edi)
+		fldl 	(%ebp)
+		break_here:
+		fmul 	%st(0), %st(1)
 
-		fmul 	%st(1), %st(0)
 		fstpl	lixoDaFpu
 		fadd	%st(0), %st(1)
 		fstpl	lixoDaFpu
@@ -328,23 +330,26 @@ movl 	p,	%ecx
 		loop	multiColunaA
 
 		adicionaC:
-		fstpl (%esi)
 
+		fstpl (%esi)
 		addl	$8,	%esi
 
 		fldz
 
 		continuaColunaB:
 
+
+	popl	%ecx
+
 	subl jumpA, %ebp
 
 	movl $vetor2, %edi
-	popl	%ecx
 
 	popl	%ebx
 
 	addl	$8,	%ebx
 	addl	%ebx,	%edi
+
 	pushl	%ebx
 
 	loop multiColunaB
@@ -356,105 +361,9 @@ movl 	p,	%ecx
 	popl	%ebx
 	popl	%ecx
 
-addl	jumpA,	%ebp
+	addl	jumpA,	%ebp
 
 loop multiLinhasA
-
-printMatrizA:
-
-pushl $mensagemMatrizA
-call 	printf
-popl	%ebx
-
-movl	$vetor1,	%edi
-movl	tamanhoMatrizA,	%ecx
-
-movl	$0, %ebx
-movl	$0,	%edx
-jmp 	printNumerosMatrizA
-
-quebraA:
-
-pushl	%ecx
-pushl $barraN
-call 	printf
-
-popl	%ebx
-popl	%ecx
-
-movl	$0, %edx
-
-printNumerosMatrizA:
-cmp		n, %edx
-je 		quebraA
-
-fldl	(%edi)
-addl 	$8, %edi
-
-pushl %ecx
-pushl %edx
-subl 	$8, %esp
-fstpl	(%esp)
-pushl $elemento
-
-call  printf
-
-addl	$12, %esp
-
-popl 	%edx
-popl 	%ecx
-
-incl	%edx
-loop	printNumerosMatrizA
-
-
-printMatrizB:
-
-pushl $mensagemMatrizB
-call 	printf
-popl	%ebx
-
-movl	$vetor2,	%edi
-movl	tamanhoMatrizB,	%ecx
-
-movl	$0, %ebx
-movl	$0,	%edx
-jmp 	printNumerosMatrizB
-
-quebraB:
-
-pushl	%ecx
-pushl $barraN
-call 	printf
-
-popl	%ebx
-popl	%ecx
-
-movl	$0, %edx
-
-printNumerosMatrizB:
-cmp		n, %edx
-je 		quebraB
-
-fldl	(%edi)
-addl 	$8, %edi
-
-pushl %ecx
-pushl %edx
-subl 	$8, %esp
-fstpl	(%esp)
-pushl $elemento
-
-call  printf
-
-addl	$12, %esp
-
-popl 	%edx
-popl 	%ecx
-
-incl	%edx
-loop	printNumerosMatrizB
-
 
 
 # Utilizado para printar a matriz resultante:
@@ -471,7 +380,7 @@ printMatrizR:
 
 pushl $mensagemMatrizR
 call 	printf
-popl	%ebx
+addl $4, %esp
 
 movl	$vetorR,	%edi
 movl	tamanhoMatrizR,	%ecx
@@ -492,8 +401,8 @@ popl	%ecx
 movl	$0, %edx
 
 printNumerosMatrizR:
-cmp		n, %edx
-je 		quebraB
+cmp		p, %edx
+je 		quebraR
 
 fldl	(%edi)
 addl 	$8, %edi
@@ -515,6 +424,7 @@ incl	%edx
 loop	printNumerosMatrizR
 
 
+
 # printMatrizR:
 
 # pushl $mensagemMatrizR
@@ -527,6 +437,13 @@ loop	printNumerosMatrizR
 # movl	$0, %ebx
 # movl	$0,	%edx
 # jmp 	printNumerosMatrizR
+
+# movl SYS_OPEN, %eax
+# movl $nomearqescrita, %ebx
+# movl O_WRONLY, %ecx
+# orl  O_CREATE, %ecx
+# movl S_IRUSR, %edx
+# orl  S_IWUSR, %edx
 
 # quebraR:
 
