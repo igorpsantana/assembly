@@ -15,11 +15,13 @@ matrizAelemento:		.asciz	"A[%d][%d]: "
 matrizBelemento:		.asciz	"B[%d][%d]: "
 
 elemento:						.asciz	"[%lf]\t"
+longfloat:					.asciz  "%lf\t"
 
 mensagemMatrizA:		.asciz	"\nMatriz A: \n"
 mensagemMatrizB:		.asciz	"\nMatriz B: \n"
 mensagemMatrizR:		.asciz	"\nMatriz Resultante: \n"
 
+nullString: 				.asciz	""
 m:									.int	0
 n:									.int	0
 p:									.int 	0
@@ -315,7 +317,6 @@ movl 	p,	%ecx
 
 		fldl 	(%edi)
 		fldl 	(%ebp)
-		break_here:
 		fmul 	%st(0), %st(1)
 
 		fstpl	lixoDaFpu
@@ -423,107 +424,74 @@ popl 	%ecx
 incl	%edx
 loop	printNumerosMatrizR
 
+# --------------------------------------------------------------------------------------
+
+printMatrizR1:
+
+pushl $mensagemMatrizR
+call 	printf
+addl $4, %esp
+
+movl	$vetorR,	%edi
+movl	tamanhoMatrizR,	%ecx
+
+movl	$0, %ebx
+movl	$0,	%edx
+
+movl SYS_OPEN, %eax
+movl $nomearqescrita, %ebx
+movl O_WRONLY, %ecx
+orl  O_CREATE, %ecx
+movl S_IRUSR, %edx
+orl  S_IWUSR, %edx
+int  $0x80
+
+jmp 	printNumerosMatrizR1
+
+quebraR1:
+
+pushl	%ecx
+movl  SYS_WRITE, %eax
+movl  $barraN, %ecx
+pushl $1
+int		$0x80
+popl %ecx
+
+movl	$0, %edx
+
+printNumerosMatrizR1:
+cmp		p, %edx
+je 		quebraR1
+
+pushl %edx
+pushl %ecx
+
+fldl	(%edi)
+addl 	$8, %edi
+pushl %edi
+subl 	$8, %esp
+fstpl (%esp)
+pushl $longfloat
+pushl $nullString
+call  sprintf
+addl 	$16, %esp
+
+movl 	SYS_WRITE, %eax
+movl 	$nullString, %ecx
+movl 	$8, %edx
+int		$0x80
+
+popl 	%edi
+popl 	%ecx
+popl	%edx
+
+incl	%edx
+loop	printNumerosMatrizR1
 
 
-# printMatrizR:
-
-# pushl $mensagemMatrizR
-# call 	printf
-# popl	%ebx
-
-# movl	$vetorR,	%edi
-# movl	tamanhoMatrizR,	%ecx
-
-# movl	$0, %ebx
-# movl	$0,	%edx
-# jmp 	printNumerosMatrizR
-
-# movl SYS_OPEN, %eax
-# movl $nomearqescrita, %ebx
-# movl O_WRONLY, %ecx
-# orl  O_CREATE, %ecx
-# movl S_IRUSR, %edx
-# orl  S_IWUSR, %edx
-
-# quebraR:
-
-# movl SYS_OPEN, %eax
-# movl $nomearqescrita, %ebx
-# movl O_WRONLY, %ecx
-# orl  O_CREATE, %ecx
-# movl S_IRUSR, %edx
-# orl  S_IWUSR, %edx
-# int  $0x80
-
-# pushl %eax
-
-# movl %eax, %ebx
-# movl SYS_WRITE, %eax
-# movl $barraT, %ecx
-# movl $8, %edx
-# int  $0x80
-
-# movl SYS_CLOSE, %eax
-# popl %ebx
-# int $0x80
-
-# popl	%ebx
-# popl	%ecx
-
-# movl	$0, %edx
-
-# printNumerosMatrizR:
-# cmp		p, %edx
-# je 		quebraR
-
-# movl 	(%edi), %eax
-# addl 	$4, 		%edi
-
-# pushl %eax
-# pushl %ebx
-# pushl %ecx
-# pushl %edx
-
-# movl SYS_OPEN, %eax
-# movl $nomearqescrita, %ebx
-# movl O_WRONLY, %ecx
-# orl  O_CREATE, %ecx
-# movl S_IRUSR, %edx
-# orl  S_IWUSR, %edx
-# int  $0x80
-
-# pushl %eax
-
-# movl %eax, %ebx
-# movl SYS_WRITE, %eax
-# movl $elemento, %ecx
-# movl $8, %edx
-# int  $0x80
-
-# movl SYS_CLOSE, %eax
-# popl %ebx
-# int $0x80
-
-# popl %eax
-# popl %edx
-# popl %ecx
-# popl %ebx
-# popl %eax
-
-# # pushl %ecx
-# # pushl %edx
-# # pushl	%eax
-# # pushl $elemento
-
-# # call  printf
-
-# # popl 	%ebx
-# # popl 	%eax
-# # popl 	%edx
-# # popl 	%ecx
-
-# incl	%edx
-# loop	printNumerosMatrizR
+movl SYS_CLOSE, %eax
+popl %ebx
+int $0x80
 
 finaliza:
 pushl $barraN
