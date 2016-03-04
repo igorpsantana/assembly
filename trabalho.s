@@ -488,7 +488,6 @@ popl	%edx
 incl	%edx
 loop	printNumerosMatrizR1
 
-
 movl SYS_CLOSE, %eax
 popl %ebx
 int $0x80
