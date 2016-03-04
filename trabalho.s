@@ -434,9 +434,7 @@ addl $4, %esp
 
 movl	$vetorR,	%edi
 movl	tamanhoMatrizR,	%ecx
-
-movl	$0, %ebx
-movl	$0,	%edx
+pushl %edi
 
 movl SYS_OPEN, %eax
 movl $nomearqescrita, %ebx
@@ -445,6 +443,8 @@ orl  O_CREATE, %ecx
 movl S_IRUSR, %edx
 orl  S_IWUSR, %edx
 int  $0x80
+
+pushl %eax
 
 jmp 	printNumerosMatrizR1
 
@@ -463,12 +463,15 @@ printNumerosMatrizR1:
 cmp		p, %edx
 je 		quebraR1
 
+
+
+pushl %ebx
 pushl %edx
 pushl %ecx
 
+
 fldl	(%edi)
 addl 	$8, %edi
-pushl %edi
 subl 	$8, %esp
 fstpl (%esp)
 pushl $longfloat
@@ -481,15 +484,15 @@ movl 	$nullString, %ecx
 movl 	$8, %edx
 int		$0x80
 
-popl 	%edi
 popl 	%ecx
-popl	%edx
+popl 	%edx
+popl	%ebx
 
 incl	%edx
+
 loop	printNumerosMatrizR1
 
 movl SYS_CLOSE, %eax
-popl %ebx
 int $0x80
 
 finaliza:
